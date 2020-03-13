@@ -402,7 +402,7 @@ class ElectraPreTrainingDiscriminatorHeads(nn.Module):
         self.LayerNorm = BertLayerNorm(config.hidden_size, eps=config.layer_norm_eps)
         self.classifier = nn.Linear(config.hidden_size, 1)
 
-    def forward(self, hidden_states,is_replaced_label = None):
+    def forward(self, hidden_states,is_replaced_label = None,attention_mask = None):
         hidden_states = self.dense(hidden_states)
         hidden_states = self.transform_act_fn(hidden_states)
         hidden_states = self.LayerNorm(hidden_states)
@@ -410,7 +410,13 @@ class ElectraPreTrainingDiscriminatorHeads(nn.Module):
         outputs = (logits,)
         if is_replaced_label is not None:
             loss_fct = BCEWithLogitsLoss()
-            discriminator_loss = loss_fct(logits.view(-1),is_replaced_label.view(-1))
+            if attention_mask is not None:
+                active_indices = attention_mask.view(-1) ==1
+                active_logits = logits.view(-1)[active_indices]
+                active_labels = is_replaced_label.view(-1)[active_indices]
+                discriminator_loss = loss_fct(active_logits, active_labels)
+            else:
+                discriminator_loss = loss_fct(logits.view(-1),is_replaced_label.view(-1))
             outputs += (discriminator_loss,)
         return outputs
 
@@ -723,9 +729,12 @@ class ElectraForPreTraining(BertPreTrainedModel):
         sequence_output, _ = generator_outputs[:2]
         g_logits,g_loss = self.generator_predictions(sequence_output,masked_lm_labels)
         original_ids = input_ids.clone()
-        generator_ids = temperature_sampling(g_logits, self.config.temperature)
+        generator_ids = input_ids.clone()
+        sample_ids = temperature_sampling(g_logits, self.config.temperature)
+        sample_ids  = sample_ids.to(original_ids.device)
         masked_indices = (masked_lm_labels.long() != -100) #
         original_ids[masked_indices] = masked_lm_labels[masked_indices]
+        generator_ids[masked_indices] = sample_ids[masked_indices]
         is_replaced_label = (generator_ids.long() != original_ids.long()).float()
         electra_outputs = self.electra(
             generator_ids,

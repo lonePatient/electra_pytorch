@@ -311,7 +311,7 @@ class LMAccuracy(Metric):
 
     def __call__(self,logits,target):
         pred = torch.argmax(logits, 1)
-        active_acc = target.view(-1) != -1
+        active_acc = target.view(-1) != -100
         active_pred = pred[active_acc]
         active_labels = target[active_acc]
 

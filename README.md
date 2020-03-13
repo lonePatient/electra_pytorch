@@ -46,7 +46,8 @@ Before running anyone of these GLUE tasks you should download the [GLUE data](ht
 
 ## Result
 
-Performance of electra on GLUE benchmark results using a single-model setup on **dev**:
+Performance of **electra** on GLUE benchmark results using a single-model setup on **dev**:
+
 
 |  | Cola| Sst-2| Mnli| Sts-b|
 | :------- | :---------: | :---------: |:---------: | :---------: |
@@ -57,5 +58,6 @@ Performance of electra on GLUE benchmark results using a single-model setup on *
 | electra_small | 56.6 | 90.5 |  | 87.6 |
 | electra_base | 67.8 | 94.2 |  | 91.1 |
 | electra_large | 71.1 | 95.8 |  | 92.4 |
+
 
 

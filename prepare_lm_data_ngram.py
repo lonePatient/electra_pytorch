@@ -238,7 +238,7 @@ def main():
     parser.add_argument("--vocab_path", default=None, type=str, required=True)
     parser.add_argument("--output_dir", default=None, type=str, required=True)
 
-    parser.add_argument('--data_name', default='albert', type=str)
+    parser.add_argument('--data_name', default='electra', type=str)
     parser.add_argument('--max_ngram', default=3, type=int)
     parser.add_argument("--do_data", default=False, action='store_true')
     parser.add_argument("--do_split", default=False, action='store_true')
@@ -312,7 +312,7 @@ python prepare_lm_data_ngram.py \
     --data_dir=dataset/ \
     --vocab_path=vocab.txt \
     --output_dir=outputs/ \
-    --data_name=albert \
+    --data_name=electra \
     --max_ngram=3 \
     --do_data
 '''

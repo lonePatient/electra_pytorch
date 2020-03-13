@@ -138,10 +138,6 @@ def main():
                         help='masked language modeling / generator loss')
     parser.add_argument("--disc_weight",default=50,type=float,
                         help='discriminator loss')
-    parser.add_argument("--generator_hidden_size",default=0.25,type=float,
-                        help='frac of discrim hidden size for gen')
-    parser.add_argument('--generator_layers',default=1.0,type=float,
-                        help='frac of discriminator layers for generator')
     parser.add_argument('--untied_generator',action='store_true',
                         help='tie all generator/discriminator weights?')
     parser.add_argument('--temperature',default=1.0,type=float,
@@ -155,7 +151,7 @@ def main():
     parser.add_argument("--adam_epsilon", default=1e-8, type=float,
                         help="Epsilon for Adam optimizer.")
     parser.add_argument('--max_grad_norm', default=1.0, type=float)
-    parser.add_argument("--learning_rate", default=0.0005, type=float,
+    parser.add_argument("--learning_rate", default=0.0000176, type=float,
                         help="The initial learning rate for Adam.")
     parser.add_argument('--seed', type=int, default=42,
                         help="random seed for initialization")
@@ -189,8 +185,7 @@ def main():
             break
     logger.info(f"samples_per_epoch: {samples_per_epoch}")
     if args.local_rank == -1 or args.no_cuda:
-        device = torch.device( "cpu")
-        # device = torch.device(f"cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
+        device = torch.device(f"cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
         args.n_gpu = torch.cuda.device_count()
     else:
         torch.cuda.set_device(args.local_rank)
@@ -284,8 +279,12 @@ def main():
                                 masked_lm_labels = lm_label_ids)
                 loss,g_loss,d_loss,d_logits,g_logits,is_replaced_label = outputs
 
+                active_indices = input_mask.view(-1) ==1
+                active_logits = d_logits.view(-1)[active_indices]
+                active_labels = is_replaced_label.view(-1)[active_indices]
+
                 g_metric(logits=g_logits.view(-1, bert_config.vocab_size), target=lm_label_ids.view(-1))
-                d_metric(logits=d_logits.view(-1, 1), target=is_replaced_label.view(-1))
+                d_metric(logits=active_logits.view(-1, 1), target=active_labels)
 
                 if args.n_gpu > 1:
                     loss = loss.mean()  # mean() to average on multi-gpu.
@@ -363,6 +362,3 @@ def main():
 if __name__ =="__main__":
     main()
 
-'''
-python run_pretraining.py --data_dir=dataset/ --vocab_path=prev_trained_model/electra_small/vocab.txt --data_name=albert --config_path=prev_trained_model/electra_small/config.json --output_dir=outputs/
-'''

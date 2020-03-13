@@ -758,5 +758,5 @@ def temperature_sampling(logits, temperature):
     if temperature is None or temperature == 0.0:
         return torch.argmax(logits)
     probs = F.softmax(logits / temperature)
-    pred_ids = torch.multinomial(probs, 1,replacement=False)
+    pred_ids = probs.cpu().multinomial(probs.size()[1],replacement=False)
     return pred_ids
