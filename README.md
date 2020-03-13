@@ -46,7 +46,7 @@ Before running anyone of these GLUE tasks you should download the [GLUE data](ht
 
 ## Result
 
-Performance of ALBERT on GLUE benchmark results using a single-model setup on **dev**:
+Performance of electra on GLUE benchmark results using a single-model setup on **dev**:
 
 |  | Cola| Sst-2| Mnli| Sts-b|
 | :------- | :---------: | :---------: |:---------: | :---------: |
