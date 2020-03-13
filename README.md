@@ -54,7 +54,8 @@ Performance of ALBERT on GLUE benchmark results using a single-model setup on **
 
 | model | Cola| Sst-2| Mnli| Sts-b|
 | :------- | :---------: | :---------: |:---------: | :---------: |
-|  |  |  |  |  |
-
+| electra_small | 56.6 | 90.5 |  | 87.6 |
+| electra_base | 67.8 | 94.2 |  | 91.1 |
+| electra_large | 71.1 | 95.8 |  | 92.4 |
 
 
