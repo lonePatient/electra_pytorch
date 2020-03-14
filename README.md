@@ -59,5 +59,8 @@ Performance of **electra** on GLUE benchmark results using a single-model setup 
 | electra_base | 67.8 | 94.2 |  | 91.1 |
 | electra_large | 71.1 | 95.8 |  | 92.4 |
 
+## pretraining
 
+Small model on small dataset.
 
+![](./outputs/training.png)
