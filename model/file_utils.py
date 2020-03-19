@@ -1,5 +1,5 @@
 """
-Utilities for working with the local dataset cache.
+Utilities for working with the local datasets cache.
 This file is adapted from the AllenNLP library at https://github.com/allenai/allennlp
 Copyright by the AllenNLP authors.
 """

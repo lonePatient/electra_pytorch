@@ -21,7 +21,7 @@ def collate_fn(batch):
     return all_input_ids, all_attention_mask, all_token_type_ids, all_labels
 
 
-def glue_convert_examples_to_features(examples, tokenizer,
+def convert_examples_to_features(examples, tokenizer,
                                       max_seq_length=512,
                                       task=None,
                                       label_list=None,
@@ -49,12 +49,12 @@ def glue_convert_examples_to_features(examples, tokenizer,
 
     """
     if task is not None:
-        processor = glue_processors[task]()
+        processor = task_processors[task]()
         if label_list is None:
             label_list = processor.get_labels()
             logger.info("Using label list %s for task %s" % (label_list, task))
         if output_mode is None:
-            output_mode = glue_output_modes[task]
+            output_mode = task_output_modes[task]
             logger.info("Using output mode %s for task %s" % (output_mode, task))
 
     label_map = {label: i for i, label in enumerate(label_list)}
@@ -483,8 +483,241 @@ class WnliProcessor(DataProcessor):
                 InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
         return examples
 
+class IflytekProcessor(DataProcessor):
+    """Processor for the IFLYTEK data set (CLUE version)."""
 
-glue_tasks_num_labels = {
+    def get_train_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(
+            self._read_json(os.path.join(data_dir, "train.json")), "train")
+
+    def get_dev_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(
+            self._read_json(os.path.join(data_dir, "dev.json")), "dev")
+
+    def get_test_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(
+            self._read_json(os.path.join(data_dir, "test.json")), "test")
+
+    def get_labels(self):
+        """See base class."""
+        labels = []
+        for i in range(119):
+            labels.append(str(i))
+        return labels
+
+    def _create_examples(self, lines, set_type):
+        """Creates examples for the training and dev sets."""
+        examples = []
+        for (i, line) in enumerate(lines):
+            guid = "%s-%s" % (set_type, i)
+            text_a = line['sentence']
+            text_b = None
+            label = str(line['label']) if set_type != 'test' else "0"
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return examples
+
+
+class AfqmcProcessor(DataProcessor):
+    """Processor for the AFQMC data set (CLUE version)."""
+
+    def get_train_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(
+            self._read_json(os.path.join(data_dir, "train.json")), "train")
+
+    def get_dev_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(
+            self._read_json(os.path.join(data_dir, "dev.json")), "dev")
+
+    def get_test_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(
+            self._read_json(os.path.join(data_dir, "test.json")), "test")
+
+    def get_labels(self):
+        """See base class."""
+        return ["0", "1"]
+
+    def _create_examples(self, lines, set_type):
+        """Creates examples for the training and dev sets."""
+        examples = []
+        for (i, line) in enumerate(lines):
+            guid = "%s-%s" % (set_type, i)
+            text_a = line['sentence1']
+            text_b = line['sentence2']
+            label = str(line['label']) if set_type != 'test' else "0"
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return examples
+
+
+class CmnliProcessor(DataProcessor):
+    """Processor for the CMNLI data set (CLUE version)."""
+
+    def get_train_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(
+            self._read_json(os.path.join(data_dir, "train.json")), "train")
+
+    def get_dev_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(
+            self._read_json(os.path.join(data_dir, "dev.json")), "dev")
+
+    def get_test_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(
+            self._read_json(os.path.join(data_dir, "test.json")), "test")
+
+    def get_labels(self):
+        """See base class."""
+        return ["contradiction", "entailment", "neutral"]
+
+    def _create_examples(self, lines, set_type):
+        """Creates examples for the training and dev sets."""
+        examples = []
+        for (i, line) in enumerate(lines):
+            guid = "%s-%s" % (set_type, i)
+            text_a = line["sentence1"]
+            text_b = line["sentence2"]
+            label = str(line["label"]) if set_type != 'test' else 'neutral'
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return examples
+
+class TnewsProcessor(DataProcessor):
+    """Processor for the TNEWS data set (CLUE version)."""
+
+    def get_train_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(
+            self._read_json(os.path.join(data_dir, "train.json")), "train")
+
+    def get_dev_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(
+            self._read_json(os.path.join(data_dir, "dev.json")), "dev")
+
+    def get_test_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(
+            self._read_json(os.path.join(data_dir, "test.json")), "test")
+
+    def get_labels(self):
+        """See base class."""
+        labels = []
+        for i in range(17):
+            if i == 5 or i == 11:
+                continue
+            labels.append(str(100 + i))
+        return labels
+
+    def _create_examples(self, lines, set_type):
+        """Creates examples for the training and dev sets."""
+        examples = []
+        for (i, line) in enumerate(lines):
+            guid = "%s-%s" % (set_type, i)
+            text_a = line['sentence']
+            text_b = None
+            label = str(line['label']) if set_type != 'test' else "100"
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return examples
+
+class CslProcessor(DataProcessor):
+    """Processor for the CSL data set (CLUE version)."""
+
+    def get_train_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(
+            self._read_json(os.path.join(data_dir, "train.json")), "train")
+
+    def get_dev_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(
+            self._read_json(os.path.join(data_dir, "dev.json")), "dev")
+
+    def get_test_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(
+            self._read_json(os.path.join(data_dir, "test.json")), "test")
+
+    def get_labels(self):
+        """See base class."""
+        return ["0", "1"]
+
+    def _create_examples(self, lines, set_type):
+        """Creates examples for the training and dev sets."""
+        examples = []
+        for (i, line) in enumerate(lines):
+            guid = "%s-%s" % (set_type, i)
+            text_a = " ".join(line['keyword'])
+            text_b = line['abst']
+            label = str(line['label']) if set_type != 'test' else '0'
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return examples
+
+
+class WscProcessor(DataProcessor):
+    """Processor for the WSC data set (CLUE version)."""
+
+    def get_train_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(
+            self._read_json(os.path.join(data_dir, "train.json")), "train")
+
+    def get_dev_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(
+            self._read_json(os.path.join(data_dir, "dev.json")), "dev")
+
+    def get_test_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(
+            self._read_json(os.path.join(data_dir, "test.json")), "test")
+
+    def get_labels(self):
+        """See base class."""
+        return ["true", "false"]
+
+    def _create_examples(self, lines, set_type):
+        """Creates examples for the training and dev sets."""
+        examples = []
+        for (i, line) in enumerate(lines):
+            guid = "%s-%s" % (set_type, i)
+            text_a = line['text']
+            text_a_list = list(text_a)
+            target = line['target']
+            query = target['span1_text']
+            query_idx = target['span1_index']
+            pronoun = target['span2_text']
+            pronoun_idx = target['span2_index']
+            assert text_a[pronoun_idx: (pronoun_idx + len(pronoun))] == pronoun, "pronoun: {}".format(pronoun)
+            assert text_a[query_idx: (query_idx + len(query))] == query, "query: {}".format(query)
+            if pronoun_idx > query_idx:
+                text_a_list.insert(query_idx, "_")
+                text_a_list.insert(query_idx + len(query) + 1, "_")
+                text_a_list.insert(pronoun_idx + 2, "[")
+                text_a_list.insert(pronoun_idx + len(pronoun) + 2 + 1, "]")
+            else:
+                text_a_list.insert(pronoun_idx, "[")
+                text_a_list.insert(pronoun_idx + len(pronoun) + 1, "]")
+                text_a_list.insert(query_idx + 2, "_")
+                text_a_list.insert(query_idx + len(query) + 2 + 1, "_")
+            text_a = "".join(text_a_list)
+            text_b = None
+            label = str(line['label']) if set_type != 'test' else 'true'
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return examples
+
+task_tasks_num_labels = {
     "mnli": 3,
     "mrpc": 2,
     "sst-2": 2,
@@ -494,9 +727,15 @@ glue_tasks_num_labels = {
     "rte": 2,
     'lcqmc': 2,
     "xnli": 3,
+    'iflytek': 119,
+    'cmnli': 3,
+    'afqmc': 2,
+    'csl': 2,
+    'wsc': 2,
+    'tnews': 15,
 }
 
-glue_processors = {
+task_processors = {
     "cola": ColaProcessor,
     "mnli": MnliProcessor,
     "mnli-mm": MnliMismatchedProcessor,
@@ -508,9 +747,15 @@ glue_processors = {
     "rte": RteProcessor,
     'lcqmc': LcqmcProcessor,
     "wnli": WnliProcessor,
+    'tnews': TnewsProcessor,
+    'iflytek': IflytekProcessor,
+    'cmnli': CmnliProcessor,
+    'afqmc': AfqmcProcessor,
+    'csl': CslProcessor,
+    'wsc': WscProcessor,
 }
 
-glue_output_modes = {
+task_output_modes = {
     "cola": "classification",
     "mnli": "classification",
     "mnli-mm": "classification",
@@ -522,4 +767,10 @@ glue_output_modes = {
     "rte": "classification",
     "wnli": "classification",
     'lcqmc': "classification",
+    'tnews': "classification",
+    'iflytek': "classification",
+    'cmnli': "classification",
+    'afqmc': "classification",
+    'csl': "classification",
+    'wsc': "classification",
 }

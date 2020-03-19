@@ -18,9 +18,11 @@ by Kevin Clark. Minh-Thang Luong. Quoc V. Le. Christopher D. Manning
 - sentencepiece
 - python3.6+
 
-## Download Pre-trained Models of English
+## Download Pre-trained Models 
 
-Official download links: [google electra](https://github.com/google-research/electra)
+**English**: Official download links: [google electra](https://github.com/google-research/electra)
+
+**Chinese**: https://github.com/CLUEbenchmark/ELECTRA
 
 ## Fine-tuning
 
@@ -37,12 +39,11 @@ example:
 ```python
 python convert_electra_tf_checkpoint_to_pytorch.py \
     --tf_checkpoint_path=./prev_trained_model/electra_large \
-    --bert_config_file=./prev_trained_model/electra_large/config.json \
+    --electra_config_file=./prev_trained_model/electra_large/config.json \
     --pytorch_dump_path=./prev_trained_model/electra_large/pytorch_model.bin
 ```
-The [General Language Understanding Evaluation (GLUE) benchmark](https://gluebenchmark.com/) is a collection of nine sentence- or sentence-pair language understanding tasks for evaluating and analyzing natural language understanding systems.
 
-Before running anyone of these GLUE tasks you should download the [GLUE data](https://gluebenchmark.com/tasks) by running [this script](https://gist.github.com/W4ngatang/60c2bdb54d156a41194446737ce03e2e) and unpack it to some directory $DATA_DIR.
+Before running anyone of these GLUE/CLUE tasks you should download the [GLUE data](https://gluebenchmark.com/tasks) /[CLUE data](https://www.cluebenchmarks.com/introduce.html) by running  script named `download_xxxx_data` in the directory`tools` and unpack it to some directory $DATA_DIR.
 
 3．run `sh run_classifier_sst2.sh`to fine tuning albert model
 
@@ -50,16 +51,20 @@ Before running anyone of these GLUE tasks you should download the [GLUE data](ht
 
 Performance of **electra** on GLUE benchmark results using a single-model setup on **dev**:
 
-
 |  | Cola| Sst-2| Mnli| Sts-b|
 | :------- | :---------: | :---------: |:---------: | :---------: |
-| metric | matthews_corrcoef |accuracy |accuracy | pearson |
-
-| model | Cola| Sst-2| Mnli| Sts-b|
-| :------- | :---------: | :---------: |:---------: | :---------: |
+| metrics | matthews_corrcoef | accuracy | accuracy | pearson |
 | electra_small | 56.6 | 90.5 |  | 87.6 |
 | electra_base | 67.8 | 94.2 |  | 91.1 |
 | electra_large | 71.1 | 95.8 |  | 92.4 |
+
+Performance of **electra** on CLUE benchmark results using a single-model setup on **dev**:
+
+
+|  | AFQMC| TNEWS|IFLYTEK|
+| :------- | :---------: | :---------: |:---------: |
+| metrics | accuracy | accuracy | accuracy |
+| electra_tiny | 69.82 | 54.48 |  | 56.98 |
 
 ## pretraining
 

@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader, Dataset, RandomSampler
 from torch.utils.data.distributed import DistributedSampler
 from tools.common import AverageMeter
 from metrics.custom_metrics import LMAccuracy,AccuracyThresh
-from model.modeling_electra import ElectraForPreTraining, BertConfig
+from model.modeling_electra import ElectraForPreTraining, ElectraConfig
 from model.file_utils import CONFIG_NAME
 from model.tokenization_bert import BertTokenizer
 from callback.optimization.adamw import AdamW
@@ -122,7 +122,7 @@ def main():
     parser.add_argument("--do_lower_case", action='store_true',
                         help="Set this flag if you are using an uncased model.")
 
-    parser.add_argument('--num_eval_steps', default=1000)
+    parser.add_argument('--num_eval_steps', default=100)
     parser.add_argument('--num_save_steps', default=2000)
     parser.add_argument("--local_rank", type=int, default=-1,
                         help="local_rank for distributed training on gpus")
@@ -132,7 +132,7 @@ def main():
                         help="Whether not to use CUDA when available")
     parser.add_argument('--gradient_accumulation_steps', type=int, default=1,
                         help="Number of updates steps to accumulate before performing a backward/update pass.")
-    parser.add_argument("--train_batch_size", default=16, type=int,
+    parser.add_argument("--train_batch_size", default=32, type=int,
                         help="Total batch size for training.")
     parser.add_argument("--gen_weight",default=1.0,type=float,
                         help='masked language modeling / generator loss')
@@ -151,7 +151,7 @@ def main():
     parser.add_argument("--adam_epsilon", default=1e-8, type=float,
                         help="Epsilon for Adam optimizer.")
     parser.add_argument('--max_grad_norm', default=1.0, type=float)
-    parser.add_argument("--learning_rate", default=0.0000176, type=float,
+    parser.add_argument("--learning_rate", default=0.000176, type=float,
                         help="The initial learning rate for Adam.")
     parser.add_argument('--seed', type=int, default=42,
                         help="random seed for initialization")
@@ -211,7 +211,7 @@ def main():
         num_train_optimization_steps = num_train_optimization_steps // torch.distributed.get_world_size()
     args.warmup_steps = int(num_train_optimization_steps * args.warmup_proportion)
 
-    bert_config = BertConfig.from_pretrained(args.config_path,gen_weight=args.gen_weight,temperature = args.temperature,
+    bert_config = ElectraConfig.from_pretrained(args.config_path,gen_weight=args.gen_weight,temperature = args.temperature,
                                              disc_weight=args.disc_weight)
     model = ElectraForPreTraining(config=bert_config)
     if args.model_path:
@@ -362,3 +362,6 @@ def main():
 if __name__ =="__main__":
     main()
 
+'''
+python run_pretraining.py --data_dir=datasets/ --vocab_path=prev_trained_model/vocab.txt --data_name=albert --config_path=prev_trained_model/electra_tiny/config.json --output_dir=outputs/
+'''

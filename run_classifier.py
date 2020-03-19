@@ -11,16 +11,16 @@ import time
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler, TensorDataset
 from torch.utils.data.distributed import DistributedSampler
 
-from model.modeling_electra import BertConfig, BertForSequenceClassification
+from model.modeling_electra import ElectraConfig, ElectraForSequenceClassification
 from model.tokenization_bert import BertTokenizer
 from model.file_utils import WEIGHTS_NAME
 from callback.optimization.adamw import AdamW
 from callback.lr_scheduler import get_linear_schedule_with_warmup
 
-from metrics.glue_compute_metrics import compute_metrics
-from processors import glue_output_modes as output_modes
-from processors import glue_processors as processors
-from processors import glue_convert_examples_to_features as convert_examples_to_features
+from metrics.task_compute_metrics import compute_metrics
+from processors import task_output_modes as output_modes
+from processors import task_processors as processors
+from processors import convert_examples_to_features
 from processors import collate_fn
 from tools.common import seed_everything
 from tools.common import init_logger, logger
@@ -199,11 +199,11 @@ def evaluate(args, model, tokenizer, prefix=""):
 
 def load_and_cache_examples(args, task, tokenizer, data_type='train'):
     if args.local_rank not in [-1, 0] and not evaluate:
-        torch.distributed.barrier()  # Make sure only the first process in distributed training process the dataset, and the others will use the cache
+        torch.distributed.barrier()  # Make sure only the first process in distributed training process the datasets, and the others will use the cache
 
     processor = processors[task]()
     output_mode = output_modes[task]
-    # Load data features from cache or dataset file
+    # Load data features from cache or datasets file
     cached_features_file = os.path.join(args.data_dir, 'cached_{}_{}_{}_{}'.format(
         data_type,
         list(filter(None, args.model_name_or_path.split('/'))).pop(),
@@ -213,7 +213,7 @@ def load_and_cache_examples(args, task, tokenizer, data_type='train'):
         logger.info("Loading features from cached file %s", cached_features_file)
         features = torch.load(cached_features_file)
     else:
-        logger.info("Creating features from dataset file at %s", args.data_dir)
+        logger.info("Creating features from datasets file at %s", args.data_dir)
         label_list = processor.get_labels()
         if task in ['mnli', 'mnli-mm'] and 'roberta' in args.model_type:
             # HACK(label indices are swapped in RoBERTa pretrained model)
@@ -236,8 +236,8 @@ def load_and_cache_examples(args, task, tokenizer, data_type='train'):
             torch.save(features, cached_features_file)
 
     if args.local_rank == 0 and not evaluate:
-        torch.distributed.barrier()  # Make sure only the first process in distributed training process the dataset, and the others will use the cache
-    # Convert to Tensors and build dataset
+        torch.distributed.barrier()  # Make sure only the first process in distributed training process the datasets, and the others will use the cache
+    # Convert to Tensors and build datasets
     all_input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
     all_attention_mask = torch.tensor([f.attention_mask for f in features], dtype=torch.long)
     all_token_type_ids = torch.tensor([f.token_type_ids for f in features], dtype=torch.long)
@@ -382,14 +382,14 @@ def main():
         torch.distributed.barrier()  # Make sure only the first process in distributed training will download model & vocab
 
     args.model_type = args.model_type.lower()
-    config = BertConfig.from_pretrained(
+    config = ElectraConfig.from_pretrained(
         args.config_name if args.config_name else args.model_name_or_path,
         num_labels=num_labels,finetuning_task=args.task_name)
     tokenizer = BertTokenizer.from_pretrained(
         args.tokenizer_name if args.tokenizer_name else args.model_name_or_path,
         do_lower_case=args.do_lower_case,
         cache_dir=args.cache_dir if args.cache_dir else None,)
-    model =BertForSequenceClassification.from_pretrained(
+    model =ElectraForSequenceClassification.from_pretrained(
         args.model_name_or_path,
         from_tf=bool('.ckpt' in args.model_name_or_path),
         config=config)
@@ -436,7 +436,7 @@ def main():
             global_step = checkpoint.split('-')[-1] if len(checkpoints) > 1 else ""
             prefix = checkpoint.split('/')[-1] if checkpoint.find('checkpoint') != -1 else ""
 
-            model =BertForSequenceClassification.from_pretrained(checkpoint)
+            model =ElectraForSequenceClassification.from_pretrained(checkpoint)
             model.to(args.device)
             result = evaluate(args, model, tokenizer, prefix=prefix)
             results.extend([(k + '_{}'.format(global_step), v) for k, v in result.items()])

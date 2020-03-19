@@ -1,6 +1,6 @@
 CURRENT_DIR=`pwd`
 export BERT_BASE_DIR=$CURRENT_DIR/prev_trained_model/electra_small
-export DATA_DIR=$CURRENT_DIR/dataset
+export DATA_DIR=$CURRENT_DIR/datasets
 export OUTPUR_DIR=$CURRENT_DIR/outputs
 TASK_NAME="sts-b"
 python run_classifier.py \
@@ -25,7 +25,7 @@ python run_classifier.py \
 
 CURRENT_DIR=`pwd`
 export BERT_BASE_DIR=$CURRENT_DIR/prev_trained_model/electra_base
-export DATA_DIR=$CURRENT_DIR/dataset
+export DATA_DIR=$CURRENT_DIR/datasets
 export OUTPUR_DIR=$CURRENT_DIR/outputs
 TASK_NAME="sts-b"
 python run_classifier.py \
@@ -50,7 +50,7 @@ python run_classifier.py \
 #
 CURRENT_DIR=`pwd`
 export BERT_BASE_DIR=$CURRENT_DIR/prev_trained_model/electra_large
-export DATA_DIR=$CURRENT_DIR/dataset
+export DATA_DIR=$CURRENT_DIR/datasets
 export OUTPUR_DIR=$CURRENT_DIR/outputs
 TASK_NAME="sts-b"
 python run_classifier.py \

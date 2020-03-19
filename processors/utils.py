@@ -102,3 +102,13 @@ class DataProcessor(object):
             for line in reader:
                 lines.append(line.strip().split("_!_"))
             return lines
+
+    @classmethod
+    def _read_json(cls, input_file):
+        """Reads a json list file."""
+        with open(input_file, "r") as f:
+            reader = f.readlines()
+            lines = []
+            for line in reader:
+                lines.append(json.loads(line.strip()))
+            return lines

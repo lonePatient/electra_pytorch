@@ -6,15 +6,14 @@ from torch import nn
 from torch.nn import CrossEntropyLoss, MSELoss,BCEWithLogitsLoss
 
 from .activations import gelu, gelu_new, swish
-from .configuration_bert import BertConfig
+from .configuration_electra import ElectraConfig
 from .file_utils import add_start_docstrings, add_start_docstrings_to_callable
 from .modeling_utils import PreTrainedModel, prune_linear_layer
-from .modeling_utils import temperature_sampling
-from .configuration_bert import get_generator_config
-
+from .configuration_electra import get_generator_config
+import torch.nn.functional as F
 logger = logging.getLogger(__name__)
 
-BERT_PRETRAINED_MODEL_ARCHIVE_MAP = {
+ELECTRA_PRETRAINED_MODEL_ARCHIVE_MAP = {
     "electra_small": "",
     "electra_base": "",
     "electra_large": "",
@@ -364,7 +363,7 @@ class BertEncoder(nn.Module):
             outputs = outputs + (all_attentions,)
         return outputs  # last-layer hidden state, (all hidden states), (all attentions)
 
-class ElectraPreTrainingGeneratorHeads(nn.Module):
+class ElectraGeneratorHeads(nn.Module):
     def __init__(self, config):
         super().__init__()
         self.config = config
@@ -391,7 +390,7 @@ class ElectraPreTrainingGeneratorHeads(nn.Module):
             outputs += (genenater_loss,)
         return outputs
 
-class ElectraPreTrainingDiscriminatorHeads(nn.Module):
+class ElectraDiscriminatorHeads(nn.Module):
     def __init__(self, config):
         super().__init__()
         self.dense = nn.Linear(config.hidden_size, config.hidden_size)
@@ -424,10 +423,10 @@ class BertPreTrainedModel(PreTrainedModel):
     """ An abstract class to handle weights initialization and
         a simple interface for downloading and loading pretrained models.
     """
-    config_class = BertConfig
-    pretrained_model_archive_map = BERT_PRETRAINED_MODEL_ARCHIVE_MAP
+    config_class = ElectraConfig
+    pretrained_model_archive_map = ELECTRA_PRETRAINED_MODEL_ARCHIVE_MAP
     load_tf_weights = load_tf_weights_in_electra
-    base_model_prefix = "bert"
+    base_model_prefix = "electra"
 
     def _init_weights(self, module):
         """ Initialize the weights """
@@ -685,8 +684,8 @@ class ElectraForPreTraining(BertPreTrainedModel):
         self.generator_config = get_generator_config(config)
         self.generator = BertModel(self.generator_config)
         self.electra = BertModel(config)
-        self.generator_predictions = ElectraPreTrainingGeneratorHeads(self.generator_config)
-        self.discriminator_predictions = ElectraPreTrainingDiscriminatorHeads(config)
+        self.generator_predictions = ElectraGeneratorHeads(self.generator_config)
+        self.discriminator_predictions = ElectraDiscriminatorHeads(config)
         self.init_weights()
         self.tie_weights()
 
@@ -731,6 +730,7 @@ class ElectraForPreTraining(BertPreTrainedModel):
         original_ids = input_ids.clone()
         generator_ids = input_ids.clone()
         sample_ids = torch.argmax(g_logits,-1)
+        sample_ids  = sample_ids.to(original_ids.device)
         masked_indices = (masked_lm_labels.long() != -100) #
         original_ids[masked_indices] = masked_lm_labels[masked_indices]
         generator_ids[masked_indices] = sample_ids[masked_indices]
@@ -753,7 +753,7 @@ class ElectraForPreTraining(BertPreTrainedModel):
     the pooled output) e.g. for GLUE tasks. """,
     BERT_START_DOCSTRING,
 )
-class BertForSequenceClassification(BertPreTrainedModel):
+class ElectraForSequenceClassification(BertPreTrainedModel):
     def __init__(self, config):
         super().__init__(config)
         self.num_labels = config.num_labels
@@ -824,12 +824,9 @@ class BertForSequenceClassification(BertPreTrainedModel):
         )
 
         pooled_output = outputs[1]
-
         pooled_output = self.dropout(pooled_output)
         logits = self.classifier(pooled_output)
-
         outputs = (logits,) + outputs[2:]  # add hidden states and attention if they are here
-
         if labels is not None:
             if self.num_labels == 1:
                 #  We are doing regression
@@ -839,5 +836,4 @@ class BertForSequenceClassification(BertPreTrainedModel):
                 loss_fct = CrossEntropyLoss()
                 loss = loss_fct(logits.view(-1, self.num_labels), labels.view(-1))
             outputs = (loss,) + outputs
-
         return outputs  # (loss), logits, (hidden_states), (attentions)

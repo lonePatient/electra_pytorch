@@ -12,8 +12,9 @@ from .configuration_utils import PretrainedConfig
 
 logger = logging.getLogger(__name__)
 
-BERT_PRETRAINED_CONFIG_ARCHIVE_MAP = {}
-class BertConfig(PretrainedConfig):
+ELECTRA_PRETRAINED_CONFIG_ARCHIVE_MAP = {}
+
+class ElectraConfig(PretrainedConfig):
     r"""
         :class:`~pytorch_transformers.BertConfig` is the configuration class to store the configuration of a
         `BertModel`.
@@ -42,7 +43,7 @@ class BertConfig(PretrainedConfig):
                 initializing all weight matrices.
             layer_norm_eps: The epsilon used by LayerNorm.
     """
-    pretrained_config_archive_map = BERT_PRETRAINED_CONFIG_ARCHIVE_MAP
+    pretrained_config_archive_map = ELECTRA_PRETRAINED_CONFIG_ARCHIVE_MAP
 
     def __init__(self,
                  vocab_size_or_config_json_file=30522,
@@ -58,7 +59,7 @@ class BertConfig(PretrainedConfig):
                  initializer_range=0.02,
                  layer_norm_eps=1e-12,
                  **kwargs):
-        super(BertConfig, self).__init__(**kwargs)
+        super(ElectraConfig, self).__init__(**kwargs)
         if isinstance(vocab_size_or_config_json_file, str) or (sys.version_info[0] == 2
                         and isinstance(vocab_size_or_config_json_file, unicode)):
             with open(vocab_size_or_config_json_file, "r", encoding='utf-8') as reader:
