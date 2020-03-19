@@ -61,10 +61,10 @@ Performance of **electra** on GLUE benchmark results using a single-model setup 
 Performance of **electra** on CLUE benchmark results using a single-model setup on **dev**:
 
 
-|  | AFQMC| TNEWS|IFLYTEK|
+|  | AFQMC| TNEWS | IFLYTEK |
 | :------- | :---------: | :---------: |:---------: |
 | metrics | accuracy | accuracy | accuracy |
-| electra_tiny | 69.82 | 54.48 |  | 56.98 |
+| electra_tiny | 69.82 | 54.48 | 56.98 |
 
 ## pretraining
 
