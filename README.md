@@ -66,32 +66,6 @@ Performance of **electra** on CLUE benchmark results using a single-model setup 
 | metrics | accuracy | accuracy | accuracy |
 | electra_tiny | 69.82 | 54.48 | 56.98 |
 
-## sample
-
-Temperature $T  >0 $ is a hyper-parameter that regulates the probability distribution $p_i$ of the token. We divide the logits $z_i$ by $T$ before  computing  the `softmax`.
-
-$$
-p_i = \frac{\math{exp}(z_i / T)}{\sum_{j} \math{exp}(z_j / T)}
-$$
-
-$T= 1$ yields the unmodified distribution.
-
-```python
-def temperature_sampling(logits, temperature,do_sample=True):
-    assert temperature >=0
-    if do_sample:
-        if temperature != 1.0:
-            logits = logits / temperature
-        # Sample
-        batch_size,sequence_size,hidden_size = logits.size()
-        logits = logits.view(-1,hidden_size)
-        token_ids = torch.multinomial(F.softmax(logits, dim=-1), num_samples=1)
-        token_ids = token_ids.view(batch_size,sequence_size)
-    else:
-        # Greedy decoding
-        token_ids = torch.argmax(logits, dim=-1)
-    return token_ids
-```
 
 ## pretraining
 
