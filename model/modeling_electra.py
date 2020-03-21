@@ -729,8 +729,7 @@ class ElectraForPreTraining(BertPreTrainedModel):
         g_logits,g_loss = self.generator_predictions(sequence_output,masked_lm_labels)
         original_ids = input_ids.clone()
         generator_ids = input_ids.clone()
-        sample_ids = torch.argmax(g_logits,-1)
-        sample_ids  = sample_ids.to(original_ids.device)
+        sample_ids = temperature_sampling(g_logits,self.config.temperature,True)
         masked_indices = (masked_lm_labels.long() != -100) #
         original_ids[masked_indices] = masked_lm_labels[masked_indices]
         generator_ids[masked_indices] = sample_ids[masked_indices]
