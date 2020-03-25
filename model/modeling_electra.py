@@ -10,6 +10,7 @@ from .configuration_electra import ElectraConfig
 from .file_utils import add_start_docstrings, add_start_docstrings_to_callable
 from .modeling_utils import PreTrainedModel, prune_linear_layer
 from .configuration_electra import get_generator_config
+from .modeling_utils import temperature_sampling
 import torch.nn.functional as F
 logger = logging.getLogger(__name__)
 
@@ -39,6 +40,7 @@ def load_tf_weights_in_electra(model, config, tf_checkpoint_path):
     names = []
     arrays = []
     for name, shape in init_vars:
+        # print("Loading TF weight {} with shape {}".format(name, shape))
         logger.info("Loading TF weight {} with shape {}".format(name, shape))
         array = tf.train.load_variable(tf_path, name)
         names.append(name)

@@ -112,7 +112,7 @@ def main():
     parser.add_argument("--output_dir", default=None, type=str, required=True,
                         help="The output directory where the model predictions and checkpoints will be written.")
     parser.add_argument("--model_path", default='', type=str)
-    parser.add_argument('--data_name', default='albert', type=str)
+    parser.add_argument('--data_name', default='electra', type=str)
     parser.add_argument("--file_num", type=int, default=10,
                         help="Number of dynamic masking to pregenerate (with different masks)")
     parser.add_argument("--reduce_memory", action="store_true",
@@ -363,5 +363,5 @@ if __name__ =="__main__":
     main()
 
 '''
-python run_pretraining.py --data_dir=datasets/ --vocab_path=prev_trained_model/vocab.txt --data_name=albert --config_path=prev_trained_model/electra_tiny/config.json --output_dir=outputs/
+python run_pretraining.py --data_dir=datasets/ --vocab_path=prev_trained_model/vocab.txt --data_name=electra --config_path=prev_trained_model/electra_tiny/config.json --output_dir=outputs/
 '''

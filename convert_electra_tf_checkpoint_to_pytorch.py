@@ -25,9 +25,9 @@ from model.modeling_electra import load_tf_weights_in_electra
 import logging
 logging.basicConfig(level=logging.INFO)
 
-def convert_tf_checkpoint_to_pytorch(tf_checkpoint_path, bert_config_file, pytorch_dump_path):
+def convert_tf_checkpoint_to_pytorch(tf_checkpoint_path, electra_config_file, pytorch_dump_path):
     # Initialise PyTorch model
-    config = ElectraConfig.from_pretrained(bert_config_file)
+    config = ElectraConfig.from_pretrained(electra_config_file)
     # print("Building PyTorch model from configuration: {}".format(str(config)))
     model = ElectraForPreTraining(config)
     # Load weights from tf checkpoint
@@ -63,7 +63,7 @@ if __name__ == "__main__":
 
 '''
 python convert_electra_tf_checkpoint_to_pytorch.py \
-    --tf_checkpoint_path=./prev_trained_model/electra_tiny \
-    --electra_config_file=./prev_trained_model/electra_tiny/config.json \
-    --pytorch_dump_path=./prev_trained_model/electra_tiny/pytorch_model.bin
+    --tf_checkpoint_path=./prev_trained_model/electra_base_zh \
+    --electra_config_file=./prev_trained_model/electra_base_zh/config.json \
+    --pytorch_dump_path=./prev_trained_model/electra_base_zh/pytorch_model.bin
 '''

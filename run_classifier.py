@@ -112,8 +112,9 @@ def train(args, train_dataset, model, tokenizer):
                 scheduler.step()  # Update learning rate schedule
                 model.zero_grad()
                 global_step += 1
-
+            pbar(step, {'loss': loss.item()})
             if args.local_rank in [-1, 0] and args.logging_steps > 0 and global_step % args.logging_steps == 0:
+                print(" ")
                 #Log metrics
                 if args.local_rank == -1:  # Only evaluate when single GPU otherwise metrics may not average well
                     evaluate(args, model, tokenizer)
@@ -131,8 +132,6 @@ def train(args, train_dataset, model, tokenizer):
                 torch.save(optimizer.state_dict(), os.path.join(output_dir, "optimizer.pt"))
                 torch.save(scheduler.state_dict(), os.path.join(output_dir, "scheduler.pt"))
                 logger.info("Saving optimizer and scheduler states to %s", output_dir)
-            pbar(step, {'loss': loss.item()})
-        print(" ")
         if 'cuda' in str(args.device):
             torch.cuda.empty_cache()
     return global_step, tr_loss / global_step
@@ -293,7 +292,7 @@ def main():
                         help="Number of updates steps to accumulate before performing a backward/update pass.")
     parser.add_argument("--learning_rate", default=5e-5, type=float,
                         help="The initial learning rate for Adam.")
-    parser.add_argument("--weight_decay", default=0.0, type=float,
+    parser.add_argument("--weight_decay", default=0.01, type=float,
                         help="Weight deay if we apply some.")
     parser.add_argument("--adam_epsilon", default=1e-6, type=float,
                         help="Epsilon for Adam optimizer.")

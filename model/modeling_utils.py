@@ -754,17 +754,9 @@ def prune_layer(layer, index, dim=None):
     else:
         raise ValueError("Can't prune layer of class {}".format(layer.__class__))
 
-def temperature_sampling(logits, temperature,do_sample=True):
-    assert temperature >=0
-    if do_sample:
-        if temperature != 1.0:
-            logits = logits / temperature
-        # Sample
-        batch_size,sequence_size,hidden_size = logits.size()
-        logits = logits.view(-1,hidden_size)
-        token_ids = torch.multinomial(F.softmax(logits, dim=-1), num_samples=1)
-        token_ids = token_ids.view(batch_size,sequence_size)
-    else:
-        # Greedy decoding
-        token_ids = torch.argmax(logits, dim=-1)
-    return token_ids
+def temperature_sampling(logits, temperature):
+    if temperature is None or temperature == 0.0:
+        return torch.argmax(logits)
+    probs = F.softmax(logits / temperature)
+    pred_ids = probs.cpu().multinomial(probs.size()[1],replacement=False)
+    return pred_ids

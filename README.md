@@ -22,7 +22,10 @@ by Kevin Clark. Minh-Thang Luong. Quoc V. Le. Christopher D. Manning
 
 **English**: Official download links: [google electra](https://github.com/google-research/electra)
 
-**Chinese**: https://github.com/CLUEbenchmark/ELECTRA
+**Chinese**: 
+
+* https://github.com/CLUEbenchmark/ELECTRA
+* https://github.com/ymcui/Chinese-ELECTRA
 
 ## Fine-tuning
 
@@ -35,6 +38,7 @@ example:
 |  |  └── config.json
 |  |  └── vocab.txt
 ```
+
 2．convert electra tf checkpoint to pytorch
 ```python
 python convert_electra_tf_checkpoint_to_pytorch.py \
@@ -45,11 +49,11 @@ python convert_electra_tf_checkpoint_to_pytorch.py \
 
 Before running anyone of these GLUE/CLUE tasks you should download the [GLUE data](https://gluebenchmark.com/tasks) /[CLUE data](https://www.cluebenchmarks.com/introduce.html) by running  script named `download_xxxx_data` in the directory`tools` and unpack it to some directory $DATA_DIR.
 
-3．run `sh run_classifier_sst2.sh`to fine tuning albert model
+3．run `sh scripts/run_classifier_sst2.sh`to fine tuning albert model
 
 ## Result
 
-Performance of **electra** on GLUE benchmark results using a single-model setup on **dev**:
+Performance of **electra** on `GLUE` benchmark results using a single-model setup on **dev**:
 
 |  | Cola| Sst-2| Mnli| Sts-b|
 | :------- | :---------: | :---------: |:---------: | :---------: |
@@ -58,14 +62,20 @@ Performance of **electra** on GLUE benchmark results using a single-model setup 
 | electra_base | 67.8 | 94.2 |  | 91.1 |
 | electra_large | 71.1 | 95.8 |  | 92.4 |
 
-Performance of **electra** on CLUE benchmark results using a single-model setup on **dev**:
-
+Performance of **electra** on `CLUE` benchmark results using a single-model setup on **dev**:
 
 |  | AFQMC| TNEWS | IFLYTEK |
 | :------- | :---------: | :---------: |:---------: |
 | metrics | accuracy | accuracy | accuracy |
 | electra_tiny | 69.82 | 54.48 | 56.98 |
 
+Performance of **electra** on `lcqmc and chnsenticorp` results using a single-model setup on **dev**:
+
+|  | chnsenticorp |
+| :------- | :---------: |
+| metrics | accuracy |
+| electra_small |  92.75 |
+| electra_base | 94.08 |
 
 ## pretraining
 
