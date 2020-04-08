@@ -9,6 +9,9 @@ by Kevin Clark. Minh-Thang Luong. Quoc V. Le. Christopher D. Manning
 
 **NOTE**： 🤗This version is experience version,and the offical PyTorch version is waiting for the update of 🤗[huggingface](https://github.com/huggingface/transformers)
 
+**NOTE**: 2020-04-08 ELECTRA is now available in PyTorch through the HuggingFace Transformers library!  https://github.com/huggingface/transformers/releases/tag/v2.8.0
+
+
 ## Dependencies
 
 - pytorch=1.10+
