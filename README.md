@@ -72,7 +72,7 @@ Performance of **electra** on `CLUE` benchmark results using a single-model setu
 | metrics | accuracy | accuracy | accuracy |
 | electra_tiny | 69.82 | 54.48 | 56.98 |
 
-Performance of **electra** on `lcqmc and chnsenticorp` results using a single-model setup on **dev**:
+Performance of **electra** on `chnsenticorp` results using a single-model setup on **dev**:
 
 |  | chnsenticorp |
 | :------- | :---------: |
