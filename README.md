@@ -82,6 +82,6 @@ Performance of **electra** on `chnsenticorp` results using a single-model setup 
 
 ## pretraining
 
-Small model on small dataset.
+test on small dataset.
 
 ![](./outputs/training.png)
